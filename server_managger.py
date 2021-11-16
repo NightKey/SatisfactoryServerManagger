@@ -1,4 +1,6 @@
+import enum
 import subprocess, platform
+from enum import Enum
 from logger import logger_class, levels
 from typing import List
 from time import sleep
@@ -12,8 +14,11 @@ class command:
     
     def to_cmd(self) -> List[str]:
         return self.string.split(' ')
+    
+    def __str__(self):
+        return self.string
 
-class signals:
+class signals(Enum):
     SUCCESS = 0
     SIGINT = 2
     SIGQUIT = 3
@@ -38,31 +43,36 @@ class managger:
         logger.info(f"Server managger created with server path: {self.server_path}")
 
     def _update_server(self) -> None:
-        self.logger.header("Updating server")
+        self.logger.info("Updating server")
         update_command = managger.steam_update_command.fill(user_data=self.user_info, path=self.server_path)
-        updater = subprocess.Popen(update_command.to_cmd())
-        while updater.poll(): sleep(1)
-        if updater.returncode != signals.SUCCESS:
+        self.logger.info(f"Update called with following data: {update_command}")
+        try:
+            subprocess.check_call(update_command.to_cmd())
+        except subprocess.SubprocessError:
             self.logger.warning("Update failed!")
 
     def start_server(self, update_before: bool = False) -> None:
         self.run = True
         if update_before:
             self._update_server()
-        self.logger.header("Starting server")
+        self.logger.info("Starting server")
         start_command = self.environment_specific_command.fill(path=self.server_path)
         self.server = subprocess.Popen(start_command.to_cmd(), shell=True)
+        self.logger.info(f"Update called with following data: {start_command}")
     
     def stop_server(self, signal: signals = signals.SIGINT) -> None:
-        self.logger.header("Stopping server")
+        self.logger.info("Stopping server")
         self.manual_stop = True
         self.server.send_signal(signal)
+        self.logger.info(f"Sending signal: {signal.name}")
         counter = 0
         while self.server.poll():
             if counter == 2:
                 self.server.send_signal(signals.SIGQUIT)
+                self.logger.info(f"Sending signal: {signals.SIGQUIT.name}")
             if counter == 4:
                 self.server.send_signal(signals.SIGKILL)
+                self.logger.info(f"Sending signal: {signals.SIGKILL.name}")
             sleep(60)
             counter += 1
     

@@ -14,18 +14,22 @@ class levels:
         
 
 class logger_class:
-    __slots__ = "log_file", "allowed"
+    __slots__ = "log_file", "allowed", "log_to_console"
 
-    def __init__(self, log_file: str, clear: bool = False, level: levels = levels.INFO) -> None:
+    def __init__(self, log_file: str, clear: bool = False, level: levels = levels.INFO, log_to_console: bool = False) -> None:
         self.log_file = log_file
         self.allowed = levels.get_hierarchy(level)
+        self.log_to_console = log_to_console
         if clear:
             with open(log_file, "w"): pass
 
     def _log(self, level: levels, data: str, counter) -> None:
         if level not in self.allowed: return
+        log_msg = f"{counter} [{level}]: {data}\n"
         with open(self.log_file, "a") as f:
-            f.write(f"{counter} [{level}]: {data}\n")
+            f.write(log_msg)
+        if self.log_to_console:
+            print(log_msg, end="")
     
     def log(self, level: levels, data: str, counter: str = str(datetime.now())) -> None:
         if level == levels.INFO:
