@@ -23,8 +23,8 @@ class managger:
     steam_update_command = command("steamcmd +login {user_data} +force_install_dir {path} +app_update 1690800 validate +quit")
     default_server_path = "~/SatisfactoryDedicatedServer"
     anonime_user_data = "anonymous"
-    windows_run_command = command("cd {path} & FactoryServer.exe -log -unattended")
-    linux_run_command = command("cd {path} & ./FactryServer.sh")
+    windows_run_command = command("{path}/FactoryServer.exe -log -unattended")
+    linux_run_command = command("{path}/FactryServer.sh")
     def __init__(self, server_path: str = None, steam_username: str = None, steam_password: str = None, logger: logger_class = None) -> None:
         self.user_info: str = f"{steam_username} {steam_password}" if steam_username is not None else managger.anonime_user_data
         self.server_path: str = server_path if server_path is not None else managger.default_server_path
