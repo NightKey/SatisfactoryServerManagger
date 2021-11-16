@@ -11,7 +11,7 @@ class command:
         return command(self.string.format(**kwargs))
     
     def to_cmd(self) -> List[str]:
-        return self.split(' ')
+        return self.string.split(' ')
 
 class signals:
     SUCCESS = 0
