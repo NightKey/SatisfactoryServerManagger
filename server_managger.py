@@ -62,7 +62,7 @@ class managger:
         start_command = self.environment_specific_command.fill(path=self.server_path)
         self.server = subprocess.Popen(start_command.to_cmd(), shell=True)
         self.is_running = True
-        self.logger.info(f"Update called with following data: {start_command}")
+        self.logger.info(f"Start called with following data: {start_command}")
     
     def stop_server(self, signal: signals = signals.SIGINT) -> None:
         if not self.is_running:
@@ -75,10 +75,10 @@ class managger:
         while self.server.poll():
             if counter == 2:
                 self.server.send_signal(signals.SIGQUIT)
-                self.logger.info(f"Sending signal: {signals.SIGQUIT.name}")
+                self.logger.warning(f"Sending signal: {signals.SIGQUIT.name}")
             if counter == 4:
                 self.server.send_signal(signals.SIGKILL)
-                self.logger.info(f"Sending signal: {signals.SIGKILL.name}")
+                self.logger.warning(f"Sending signal: {signals.SIGKILL.name}")
             sleep(60)
             counter += 1
         self.is_running = False
@@ -86,7 +86,7 @@ class managger:
     def exit(self) -> None:
         self.logger.info("Exiting server managger...")
         self.run = False
-        if self.server.poll(): self.stop_server(signals.SIGINT)
+        if self.is_running: self.stop_server(signals.SIGINT)
 
     def update(self) -> None:
         self.update_server = True
