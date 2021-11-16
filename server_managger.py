@@ -50,7 +50,7 @@ class managger:
         if update_before:
             self._update_server()
         self.logger.header("Starting server")
-        start_command = self.environment_specific_command.fill(self.server_path)
+        start_command = self.environment_specific_command.fill(path=self.server_path)
         self.server = subprocess.Popen(start_command.to_cmd())
     
     def stop_server(self, signal: signals = signals.SIGINT) -> None:
