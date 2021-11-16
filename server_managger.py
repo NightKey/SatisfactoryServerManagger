@@ -23,8 +23,8 @@ class managger:
     steam_update_command = command("steamcmd +login {user_data} +force_install_dir {path} +app_update 1690800 validate +quit")
     default_server_path = "~/SatisfactoryDedicatedServer"
     anonime_user_data = "anonymous"
-    windows_run_command = command("FactoryServer.exe -log -unattended")
-    linux_run_command = command("./FactryServer.sh")
+    windows_run_command = command("cd {path} & FactoryServer.exe -log -unattended")
+    linux_run_command = command("cd {path} & ./FactryServer.sh")
     def __init__(self, server_path: str = None, steam_username: str = None, steam_password: str = None, logger: logger_class = None) -> None:
         self.user_info: str = f"{steam_username} {steam_password}" if steam_username is not None else managger.anonime_user_data
         self.server_path: str = server_path if server_path is not None else managger.default_server_path
@@ -50,7 +50,8 @@ class managger:
         if update_before:
             self._update_server()
         self.logger.header("Starting server")
-        self.server = subprocess.Popen(self.environment_specific_command.to_cmd())
+        start_command = self.environment_specific_command.fill(self.server_path)
+        self.server = subprocess.Popen(start_command.to_cmd())
     
     def stop_server(self, signal: signals = signals.SIGINT) -> None:
         self.logger.header("Stopping server")
