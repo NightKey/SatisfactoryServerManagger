@@ -1,4 +1,3 @@
-import enum
 import subprocess, platform
 from logger import logger_class, levels
 from typing import List
@@ -14,7 +13,7 @@ class command:
     def to_cmd(self) -> List[str]:
         return self.split(' ')
 
-class signals(enum):
+class signals:
     SUCCESS = 0
     SIGINT = 2
     SIGQUIT = 3
