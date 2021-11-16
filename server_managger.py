@@ -69,15 +69,15 @@ class managger:
             return
         self.logger.info("Stopping server")
         self.manual_stop = True
-        self.server.send_signal(signal)
+        self.server.send_signal(signal.value)
         self.logger.info(f"Sending signal: {signal.name}")
         counter = 0
         while self.server.poll():
             if counter == 2:
-                self.server.send_signal(signals.SIGQUIT)
+                self.server.send_signal(signals.SIGQUIT.value)
                 self.logger.warning(f"Sending signal: {signals.SIGQUIT.name}")
             if counter == 4:
-                self.server.send_signal(signals.SIGKILL)
+                self.server.send_signal(signals.SIGKILL.value)
                 self.logger.warning(f"Sending signal: {signals.SIGKILL.name}")
             sleep(60)
             counter += 1
