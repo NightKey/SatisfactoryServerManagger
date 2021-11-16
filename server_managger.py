@@ -33,10 +33,11 @@ class managger:
     def __init__(self, server_path: str = None, steam_username: str = None, steam_password: str = None, logger: logger_class = None) -> None:
         self.user_info: str = f"{steam_username} {steam_password}" if steam_username is not None else managger.anonime_user_data
         self.server_path: str = server_path if server_path is not None else managger.default_server_path
-        self.server: subprocess.Popen
+        self.server: subprocess.Popen = None
         self.update_server: bool = False
         self.run: bool = True
         self.manual_stop: bool = False
+        self.is_running: bool = False
         self.loop_started = False
         self.logger = logger if logger is not None else logger_class("satisfactory_server_managger.lg", levels=levels.INFO)
         self.environment_specific_command: command = managger.windows_run_command if platform.system() == "Windows" else managger.linux_run_command
@@ -52,15 +53,20 @@ class managger:
             self.logger.warning("Update failed!")
 
     def start_server(self, update_before: bool = False) -> None:
+        if self.is_running:
+            return
         self.run = True
         if update_before:
             self._update_server()
         self.logger.info("Starting server")
         start_command = self.environment_specific_command.fill(path=self.server_path)
         self.server = subprocess.Popen(start_command.to_cmd(), shell=True)
+        self.is_running = True
         self.logger.info(f"Update called with following data: {start_command}")
     
     def stop_server(self, signal: signals = signals.SIGINT) -> None:
+        if not self.is_running:
+            return
         self.logger.info("Stopping server")
         self.manual_stop = True
         self.server.send_signal(signal)
@@ -75,6 +81,7 @@ class managger:
                 self.logger.info(f"Sending signal: {signals.SIGKILL.name}")
             sleep(60)
             counter += 1
+        self.is_running = False
     
     def exit(self) -> None:
         self.logger.info("Exiting server managger...")
