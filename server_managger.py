@@ -30,7 +30,7 @@ class managger:
     anonime_user_data = "anonymous"
     default_additionals = "-log -unattended"
     windows_run_command = command("{path}/FactoryServer.exe {additionals}")
-    linux_run_command = command("{path}/FactryServer.sh {additionals}")
+    linux_run_command = command("{path}/FactoryServer.sh {additionals}")
     def __init__(self, server_path: str = None, steam_username: str = None, steam_password: str = None, logger: logger_class = None, additionals: str = None) -> None:
         self.user_info: str = f"{steam_username} {steam_password}" if steam_username is not None else managger.anonime_user_data
         self.server_path: str = server_path if server_path is not None else managger.default_server_path
