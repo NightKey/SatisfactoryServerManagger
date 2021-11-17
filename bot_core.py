@@ -11,20 +11,24 @@ def start(msg: smdb_api.Message) -> None:
         logger.warning("Not admin called the start function!")
         return
     global loop_thread
-    managger.start_server()
-    loop_thread = Thread(target=managger.loop)
+    started = managger.start_server()
+    if started:
+        loop_thread = Thread(target=managger.loop)
+    api.send_message("Server started successfully." if started else "Server start failed!", msg.sender)
 
 def stop(msg: smdb_api.Message) -> None:
     if not api.is_admin(msg.sender):
         logger.warning("Not admin called the stop function!")
         return
     managger.exit()
+    api.send_message("Server stopped!", msg.sender)
 
 def update(msg: smdb_api.Message) -> None:
     if not api.is_admin(msg.sender):
         logger.warning("Not admin called the update function!")
         return
-    managger.update()
+    updated = managger.update()
+    api.send_message("Server restarted successfully!" if updated else "Server restart failed!", msg.sender)
 
 api = smdb_api.API("Satisfactory managger", "a4bdb9b345435631ca6b9c093324ee3a76b8322811fcd82ad04f537946ab6e88")
 api.validate()

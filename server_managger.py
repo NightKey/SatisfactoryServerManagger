@@ -29,8 +29,8 @@ class managger:
     default_server_path = "~/SatisfactoryDedicatedServer"
     anonime_user_data = "anonymous"
     default_additionals = "-log -unattended"
-    windows_run_command = command("cd {path} & FactoryServer.exe {additionals}")
-    linux_run_command = command("cd {path} & ./FactryServer.sh {additionals}")
+    windows_run_command = command("{path}/FactoryServer.exe {additionals}")
+    linux_run_command = command("{path}/FactryServer.sh {additionals}")
     def __init__(self, server_path: str = None, steam_username: str = None, steam_password: str = None, logger: logger_class = None, additionals: str = None) -> None:
         self.user_info: str = f"{steam_username} {steam_password}" if steam_username is not None else managger.anonime_user_data
         self.server_path: str = server_path if server_path is not None else managger.default_server_path
@@ -54,7 +54,7 @@ class managger:
         except subprocess.SubprocessError:
             self.logger.warning("Update failed!")
 
-    def start_server(self, update_before: bool = False) -> None:
+    def start_server(self, update_before: bool = False) -> bool:
         if self.is_running:
             return
         self.run = True
@@ -63,8 +63,11 @@ class managger:
         self.logger.info("Starting server")
         start_command = self.environment_specific_command.fill(path=self.server_path, additionals=self.additionals)
         self.server = subprocess.Popen(str(start_command), shell=True)
+        if not self.server.poll():
+            return False
         self.is_running = True
         self.logger.info(f"Start called with following data: {start_command}")
+        return True
     
     def stop_server(self, signal: signals = signals.SIGINT) -> None:
         if not self.is_running:
@@ -91,12 +94,12 @@ class managger:
         self.run = False
         if self.is_running: self.stop_server(signals.SIGINT)
 
-    def update(self) -> None:
+    def update(self) -> bool:
         self.update_server = True
         self.stop_server()
         if self.loop_started:
-            return
-        self.start_server(True)
+            return True
+        return self.start_server(True)
 
     def loop(self) -> None:
         self.loop_started = True
