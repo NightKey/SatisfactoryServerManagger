@@ -65,7 +65,7 @@ class managger:
             self._update_server()
         self.logger.info("Starting server")
         start_command = self.environment_specific_command.fill(path=self.server_path, additionals=self.additionals)
-        self.server = subprocess.Popen(start_command.to_cmd(), shell=True, stdout=subprocess.PIPE)
+        self.server = subprocess.Popen(str(start_command), shell=True)
         self.is_running = True
         self.logger.info(f"Start called with following data: {start_command}")
     
@@ -106,8 +106,7 @@ class managger:
         while self.run:
             self.start_server()
             while self.server.poll():
-                for line in iter(self.server.stdout.readline, b''):
-                    print(f"SFServer: {line}")
+                print("..")
                 sleep(1)
             if self.manual_stop:
                 self.manual_stop = False
