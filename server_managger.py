@@ -63,8 +63,12 @@ class managger:
         self.logger.info("Starting server")
         start_command = self.environment_specific_command.fill(path=self.server_path, additionals=self.additionals)
         self.server = subprocess.Popen(str(start_command), shell=True)
-        if not self.server.poll():
-            return False
+        fail_count = 0
+        while not self.server.poll():
+            if fail_count == 5:
+                return False
+            sleep(15)
+            fail_count += 1
         self.is_running = True
         self.logger.info(f"Start called with following data: {start_command}")
         return True
