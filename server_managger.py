@@ -27,10 +27,12 @@ class signals(Enum):
 class managger:
     steam_update_command = command("steamcmd +login {user_data} +force_install_dir {path} +app_update 1690800 validate +quit")
     default_server_path = "~/SatisfactoryDedicatedServer"
+    linux_path_extention = "/Engine/Binaries/Linux/UE4Server-Linux-Shipping"
     anonime_user_data = "anonymous"
-    windows_run_command = command("cd {path} & FactoryServer.exe -log -unattended")
-    linux_run_command = command("cd {path} & ./FactryServer.sh")
-    def __init__(self, server_path: str = None, steam_username: str = None, steam_password: str = None, logger: logger_class = None) -> None:
+    default_additionals = "-log -unattended"
+    windows_run_command = command("cd {path} & FactoryServer.exe {additionals}")
+    linux_run_command = command("cd {path} & chmod +x FactoryServer & ./FactryServer {additionals}")
+    def __init__(self, server_path: str = None, steam_username: str = None, steam_password: str = None, logger: logger_class = None, additionals: str = None) -> None:
         self.user_info: str = f"{steam_username} {steam_password}" if steam_username is not None else managger.anonime_user_data
         self.server_path: str = server_path if server_path is not None else managger.default_server_path
         self.server: subprocess.Popen = None
@@ -39,8 +41,11 @@ class managger:
         self.manual_stop: bool = False
         self.is_running: bool = False
         self.loop_started = False
+        self.additionals = additionals if additionals is not None else managger.default_additionals
         self.logger = logger if logger is not None else logger_class("satisfactory_server_managger.lg", levels=levels.INFO)
         self.environment_specific_command: command = managger.windows_run_command if platform.system() == "Windows" else managger.linux_run_command
+        if platform.system() != "Windows":
+            self.server_path += managger.linux_path_extention
         logger.info(f"Server managger created with server path: {self.server_path}")
 
     def _update_server(self) -> None:
@@ -59,7 +64,7 @@ class managger:
         if update_before:
             self._update_server()
         self.logger.info("Starting server")
-        start_command = self.environment_specific_command.fill(path=self.server_path)
+        start_command = self.environment_specific_command.fill(path=self.server_path, additionals=self.additionals)
         self.server = subprocess.Popen(start_command.to_cmd(), shell=True, stdout=subprocess.PIPE)
         self.is_running = True
         self.logger.info(f"Start called with following data: {start_command}")
