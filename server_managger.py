@@ -64,7 +64,7 @@ class managger:
         start_command = self.environment_specific_command.fill(path=self.server_path, additionals=self.additionals)
         self.server = subprocess.Popen(str(start_command), shell=True)
         fail_count = 0
-        while not self.server.poll():
+        while self.server.poll() is not None:
             if fail_count == 5:
                 return False
             sleep(15)
@@ -81,7 +81,7 @@ class managger:
         self.server.send_signal(signal.value)
         self.logger.info(f"Sending signal: {signal.name}")
         counter = 0
-        while self.server.poll():
+        while self.server.poll() is not None:
             if counter == 2:
                 self.server.send_signal(signals.SIGQUIT.value)
                 self.logger.warning(f"Sending signal: {signals.SIGQUIT.name}")
@@ -109,7 +109,7 @@ class managger:
         self.loop_started = True
         while self.run:
             self.start_server()
-            while self.server.poll():
+            while self.server.poll() is not None:
                 print("..")
                 sleep(1)
             if self.manual_stop:
