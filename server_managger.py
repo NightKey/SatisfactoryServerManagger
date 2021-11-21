@@ -62,7 +62,7 @@ class managger:
             self._update_server()
         self.logger.info("Starting server")
         start_command = self.environment_specific_command.fill(path=self.server_path, additionals=self.additionals)
-        self.server = subprocess.Popen(str(start_command), shell=True)
+        self.server = subprocess.Popen(start_command.to_cmd())
         fail_count = 0
         while self.server.poll() is not None:
             if fail_count == 5:
