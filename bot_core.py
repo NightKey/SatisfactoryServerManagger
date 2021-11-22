@@ -14,6 +14,8 @@ def start(msg: smdb_api.Message) -> None:
     started = managger.start_server()
     if started:
         loop_thread = Thread(target=managger.loop)
+        loop_thread.name = "Server managger loop"
+        loop_thread.start()
     api.send_message("Server started successfully." if started else "Server start failed!", msg.sender)
 
 def stop(msg: smdb_api.Message) -> None:
