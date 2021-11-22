@@ -80,7 +80,7 @@ class managger:
     def test_stop(self):
         for i in range(1, 31):
             self.server.send_signal(i)
-            self.logger.log(f"Signal sent: {i}")
+            self.logger.info(f"Signal sent: {i}")
             sleep(15)
     
     def stop_server(self, signal: signals = signals.SIGINT) -> None:
