@@ -2,7 +2,7 @@ import smdb_api, server_managger
 from logger import logger_class, levels
 from threading import Thread
 
-logger = logger_class("server_managger_bot.lg", level=levels.INFO, log_to_console=True)
+logger = logger_class("server_managger_bot.log", level=levels.INFO, log_to_console=True)
 managger = server_managger.managger(server_path="/Data/SatisfactoryDedicatedServer", logger=logger)
 loop_thread: Thread = None
 

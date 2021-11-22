@@ -55,8 +55,10 @@ class managger:
             self.logger.warning("Update failed!")
 
     def start_server(self, update_before: bool = False) -> bool:
+        self.logger.info(f"Start called!")
         if self.is_running:
-            return
+            self.logger.info("Server start called, while the server is already running!")
+            return False
         self.run = True
         if update_before:
             self._update_server()
@@ -65,16 +67,18 @@ class managger:
         self.server = subprocess.Popen(start_command.to_cmd())
         fail_count = 0
         while self.server.poll() is not None:
-            if fail_count == 5:
+            if fail_count == 6:
+                self.logger.error("Server start failed!")
                 return False
-            sleep(15)
+            sleep(5)
             fail_count += 1
         self.is_running = True
-        self.logger.info(f"Start called with following data: {start_command}")
+        self.logger.info("Server started")
         return True
     
     def stop_server(self, signal: signals = signals.SIGINT) -> None:
         if not self.is_running:
+            self.logger.info("Stop called while the server is not running!")
             return
         self.logger.info("Stopping server")
         self.manual_stop = True
@@ -99,6 +103,7 @@ class managger:
         if self.is_running: self.stop_server(signals.SIGINT)
 
     def update(self) -> bool:
+        self.logger.info("Update called!")
         self.update_server = True
         self.stop_server()
         if self.loop_started:
@@ -110,9 +115,10 @@ class managger:
         while self.run:
             self.start_server()
             while self.server.poll() is not None:
-                print("..")
+                self.logger.info("Server still running!")
                 sleep(1)
             if self.manual_stop:
+                self.logger.info("Server stopped by user!")
                 self.manual_stop = False
             else:
                 self.logger.error("Server unexceptedly stopped!")
