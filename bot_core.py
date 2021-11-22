@@ -13,7 +13,7 @@ def start(msg: smdb_api.Message) -> None:
     global loop_thread
     started = managger.start_server()
     #TODO: Remove
-    server_managger.sleep(30)
+    server_managger.sleep(60)
     managger.test_stop()
     started = False
     #END TODO
