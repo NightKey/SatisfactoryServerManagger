@@ -12,6 +12,11 @@ def start(msg: smdb_api.Message) -> None:
         return
     global loop_thread
     started = managger.start_server()
+    #TODO: Remove
+    server_managger.sleep(30)
+    managger.test_stop()
+    started = False
+    #END TODO
     if started:
         loop_thread = Thread(target=managger.loop)
         loop_thread.name = "Server managger loop"

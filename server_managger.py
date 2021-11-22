@@ -3,7 +3,7 @@ import subprocess, platform
 from enum import Enum
 from logger import logger_class, levels
 from typing import List
-from time import sleep
+from time import sleep, perf_counter
 
 class command:
     def __init__(self, string_repr: str) -> None:
@@ -77,6 +77,12 @@ class managger:
         self.logger.info("Server started")
         return True
     
+    def test_stop(self):
+        for i in range(1, 31):
+            self.server.send_signal(i)
+            self.logger.log(f"Signal sent: {i}")
+            sleep(15)
+    
     def stop_server(self, signal: signals = signals.SIGINT) -> None:
         if not self.is_running:
             self.logger.info("Stop called while the server is not running!")
@@ -116,8 +122,10 @@ class managger:
         self.loop_started = True
         while self.run:
             self.start_server()
+            start_time = perf_counter()
             while self.server.poll() is None:
-                self.logger.info("Server still running!")
+                if perf_counter() - start_time % 1000 == 0:
+                    self.logger.info("Server still running!")
                 sleep(1)
             if self.manual_stop:
                 self.logger.info("Server stopped by user!")
