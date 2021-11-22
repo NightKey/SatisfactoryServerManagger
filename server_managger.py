@@ -1,4 +1,4 @@
-import enum
+import signal
 import subprocess, platform
 from enum import Enum
 from logger import logger_class, levels
@@ -18,11 +18,7 @@ class command:
     def __str__(self):
         return self.string
 
-class signals(Enum):
-    SUCCESS = 0
-    SIGINT = 2
-    SIGQUIT = 3
-    SIGKILL = 9
+SUCCESS = 0
 
 class managger:
     steam_update_command = command("steamcmd +login {user_data} +force_install_dir {path} +app_update 1690800 validate +quit")
@@ -69,7 +65,7 @@ class managger:
         while self.server.poll() is not None:
             if fail_count == 6:
                 self.logger.error("Server start failed!")
-                self.server.send_signal(signals.SIGKILL)
+                self.server.send_signal()
                 return False
             sleep(5)
             fail_count += 1
@@ -77,28 +73,16 @@ class managger:
         self.logger.info("Server started")
         return True
     
-    def test_stop(self):
-        for i in range(1, 31):
-            self.server.send_signal(i)
-            self.logger.info(f"Signal sent: {i}")
-            sleep(15)
-    
-    def stop_server(self, signal: signals = signals.SIGINT) -> None:
+    def stop_server(self) -> None:
         if not self.is_running:
             self.logger.info("Stop called while the server is not running!")
             return
         self.logger.info("Stopping server")
         self.manual_stop = True
-        self.server.send_signal(signal.value)
-        self.logger.info(f"Sending signal: {signal.name}")
+        self.server.send_signal(signal.CTRL_C_EVENT)
         counter = 0
         while self.server.poll() is None:
-            if counter == 2:
-                self.server.send_signal(signals.SIGQUIT.value)
-                self.logger.warning(f"Sending signal: {signals.SIGQUIT.name}")
-            if counter == 4:
-                self.server.send_signal(signals.SIGKILL.value)
-                self.logger.warning(f"Sending signal: {signals.SIGKILL.name}")
+            self.logger.info("Waiting for server to stop")
             sleep(60)
             counter += 1
         self.logger.info("Server stopped")
@@ -107,7 +91,7 @@ class managger:
     def exit(self) -> None:
         self.logger.info("Exiting server managger...")
         self.run = False
-        if self.is_running: self.stop_server(signals.SIGINT)
+        if self.is_running: self.stop_server()
 
     def update(self) -> bool:
         self.logger.info("Update called!")
@@ -124,7 +108,7 @@ class managger:
             self.start_server()
             start_time = perf_counter()
             while self.server.poll() is None:
-                if perf_counter() - start_time % 1000 == 0:
+                if perf_counter() - start_time % 6000 == 0:
                     self.logger.info("Server still running!")
                 sleep(1)
             if self.manual_stop:
