@@ -66,9 +66,10 @@ class managger:
         start_command = self.environment_specific_command.fill(path=self.server_path, additionals=self.additionals)
         self.server = subprocess.Popen(start_command.to_cmd())
         fail_count = 0
-        while self.server.poll() is None:
+        while self.server.poll() is not None:
             if fail_count == 6:
                 self.logger.error("Server start failed!")
+                self.server.send_signal(signals.SIGKILL)
                 return False
             sleep(5)
             fail_count += 1
