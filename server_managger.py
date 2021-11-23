@@ -26,7 +26,8 @@ class managger:
     anonime_user_data = "anonymous"
     default_additionals = "-log -unattended"
     windows_run_command = command("{path}/FactoryServer.exe {additionals}")
-    linux_run_command = command("{path}/FactoryServer.sh {additionals}")
+    linux_run_before = command("chmod +x {path}/Engine/Binaries/Linux/UE4Server-Linux-Shipping")
+    linux_run_command = command("{path}/Engine/Binaries/Linux/UE4Server-Linux-Shipping FactoryGame {additionals}")
     def __init__(self, server_path: str = None, steam_username: str = None, steam_password: str = None, logger: logger_class = None, additionals: str = None) -> None:
         self.user_info: str = f"{steam_username} {steam_password}" if steam_username is not None else managger.anonime_user_data
         self.server_path: str = server_path if server_path is not None else managger.default_server_path
@@ -59,6 +60,9 @@ class managger:
         if update_before:
             self._update_server()
         self.logger.info("Starting server")
+        if platform.system() != "Windows":
+            run_before = self.linux_run_before.fill(self.server_path)
+            subprocess.check_call(run_before.to_cmd())
         start_command = self.environment_specific_command.fill(path=self.server_path, additionals=self.additionals)
         self.server = subprocess.Popen(start_command.to_cmd())
         fail_count = 0

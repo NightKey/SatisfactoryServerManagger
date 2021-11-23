@@ -1,6 +1,7 @@
 import smdb_api, server_managger
 from logger import logger_class, levels
 from threading import Thread
+from time import sleep
 
 logger = logger_class("server_managger_bot.log", level=levels.INFO, log_to_console=True)
 managger = server_managger.managger(server_path="/Data/SatisfactoryDedicatedServer", logger=logger)
@@ -37,3 +38,11 @@ api.validate()
 api.create_function("SFStart", "Starts the satisfactory server. Admin only command.\nUsage: &SFStart\nCategory: HARDWARE", start)
 api.create_function("SFUpdate", "Updates the satisfactory server. Admin only command.\nUsage: &SFUpdate\nCategory: HARDWARE", update)
 api.create_function("SFStop", "Stops the satisfactory server. Admin only command.\nUsage: &SFStop\nCategory: HARDWARE", stop)
+try:
+    while True:
+        sleep(1)
+except KeyboardInterrupt:
+    logger.info("User terminating the bot!")
+    logger.info("Stopping Satisfactory server...")
+    managger.stop_server()
+    api.close("User interrupt")

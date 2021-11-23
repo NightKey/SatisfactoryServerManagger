@@ -12,6 +12,15 @@ class levels:
         tmp = [levels.DEBUG, levels.INFO, levels.WARNING, levels.ERROR, levels.HEADER]
         return tmp[tmp.index(selected):]
         
+class colors:
+    INFO = "\033[92m"
+    ERROR = "\033[91m"
+    WARNING = "\033[93m"
+    HEADER = "\033[94m"
+    END = "\033[0m"
+
+    def from_level(level: levels) -> "colors":
+        return getattr(colors, level)
 
 class logger_class:
     __slots__ = "log_file", "allowed", "log_to_console"
@@ -25,11 +34,12 @@ class logger_class:
 
     def _log(self, level: levels, data: str, counter) -> None:
         if level not in self.allowed: return
-        log_msg = f"{counter} [{level}]: {data}\n"
+        log_msg = f"[{counter}] [{level}]: {data}"
         with open(self.log_file, "a") as f:
             f.write(log_msg)
+            f.write("\n")
         if self.log_to_console:
-            print(log_msg, end="")
+            print(f"{colors.from_level(level)}{log_msg}{colors.END}")
     
     def log(self, level: levels, data: str, counter: str = str(datetime.now())) -> None:
         if level == levels.INFO:
