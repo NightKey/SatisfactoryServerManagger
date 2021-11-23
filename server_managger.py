@@ -34,7 +34,7 @@ class managger:
         self.run: bool = True
         self.manual_stop: bool = False
         self.is_running: bool = False
-        self.loop_started = False
+        self.loop_running = False
         self.additionals = additionals if additionals is not None else managger.default_additionals
         self.logger = logger if logger is not None else logger_class("satisfactory_server_managger.lg", LEVEL=LEVEL.INFO)
         self.environment_specific_command: command = managger.windows_run_command if platform.system() == "Windows" else managger.linux_run_command
@@ -53,7 +53,7 @@ class managger:
         self.logger.info(f"Start called!")
         if self.is_running:
             self.logger.info("Server start called, while the server is already running!")
-            return False
+            return True
         self.run = True
         if update_before:
             self._update_server()
@@ -99,13 +99,13 @@ class managger:
         self.logger.info("Update called!")
         self.update_server = True
         self.stop_server()
-        if self.loop_started:
+        if self.loop_running:
             return True
-        return self.start_server(True)
+        return self._update_server()
 
     def loop(self) -> None:
         self.logger.info("Loop started")
-        self.loop_started = True
+        self.loop_running = True
         while self.run:
             if not self.is_running:
                 self.start_server()
@@ -125,5 +125,5 @@ class managger:
                 self.update_server = False
             else:
                 self.logger.error("Server unexceptedly stopped!")
-        self.loop_started = False
+        self.loop_running = False
         self.logger.info("Main loop stopped")

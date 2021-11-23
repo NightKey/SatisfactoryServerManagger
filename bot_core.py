@@ -31,7 +31,7 @@ def update(msg: smdb_api.Message) -> None:
         logger.warning("Not admin called the update function!")
         return
     updated = managger.update()
-    api.send_message("Server restarted successfully!" if updated else "Server restart failed!", msg.sender)
+    api.send_message(("Server restarted successfully!" if managger.loop_running else "Server updated successfully!") if updated else "Server update failed!", msg.sender)
 
 api = smdb_api.API("Satisfactory managger", "a4bdb9b345435631ca6b9c093324ee3a76b8322811fcd82ad04f537946ab6e88")
 api.validate()
