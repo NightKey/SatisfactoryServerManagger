@@ -115,12 +115,15 @@ class managger:
                     self.logger.info("Server still running!")
                 sleep(1)
             self.is_running = False
-            if self.manual_stop:
-                self.logger.info("Server stopped by user!")
-                self.manual_stop = False
-            else:
-                self.logger.error("Server unexceptedly stopped!")
             if self.update_server:
                 self._update_server()
+            if self.manual_stop:
+                if not self.update_server:
+                    self.logger.info("Server stopped by user!")
+                    self.run = False
+                self.manual_stop = False
                 self.update_server = False
+            else:
+                self.logger.error("Server unexceptedly stopped!")
+        self.loop_started = False
         self.logger.info("Main loop stopped")
