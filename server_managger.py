@@ -1,7 +1,5 @@
-import signal
 import subprocess, platform
-from enum import Enum
-from logger import logger_class, levels
+from logger import logger_class, LEVEL
 from typing import List
 from time import sleep, perf_counter
 
@@ -38,7 +36,7 @@ class managger:
         self.is_running: bool = False
         self.loop_started = False
         self.additionals = additionals if additionals is not None else managger.default_additionals
-        self.logger = logger if logger is not None else logger_class("satisfactory_server_managger.lg", levels=levels.INFO)
+        self.logger = logger if logger is not None else logger_class("satisfactory_server_managger.lg", LEVEL=LEVEL.INFO)
         self.environment_specific_command: command = managger.windows_run_command if platform.system() == "Windows" else managger.linux_run_command
         logger.info(f"Server managger created with server path: {self.server_path}")
 
