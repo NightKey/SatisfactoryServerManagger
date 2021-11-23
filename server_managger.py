@@ -59,7 +59,7 @@ class managger:
             self._update_server()
         self.logger.info("Starting server")
         if platform.system() != "Windows":
-            run_before = self.linux_run_before.fill(self.server_path)
+            run_before = self.linux_run_before.fill(path=self.server_path)
             subprocess.check_call(run_before.to_cmd())
         start_command = self.environment_specific_command.fill(path=self.server_path, additionals=self.additionals)
         self.server = subprocess.Popen(start_command.to_cmd())
