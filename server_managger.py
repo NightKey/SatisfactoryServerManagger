@@ -79,12 +79,12 @@ class managger:
             return
         self.logger.info("Stopping server")
         self.manual_stop = True
-        self.server.send_signal(signal.CTRL_C_EVENT)
-        counter = 0
+        self.server.terminate()
+        self.logger.info("Waiting for server to stop")
+        sleep(60)
         while self.server.poll() is None:
-            self.logger.info("Waiting for server to stop")
+            self.logger.warning("Serve did not terminate after 60 secunds!")
             sleep(60)
-            counter += 1
         self.logger.info("Server stopped")
         self.is_running = False
     
@@ -105,12 +105,14 @@ class managger:
         self.logger.info("Loop started")
         self.loop_started = True
         while self.run:
-            self.start_server()
+            if not self.is_running:
+                self.start_server()
             start_time = perf_counter()
             while self.server.poll() is None:
                 if perf_counter() - start_time % 6000 == 0:
                     self.logger.info("Server still running!")
                 sleep(1)
+            self.is_running = False
             if self.manual_stop:
                 self.logger.info("Server stopped by user!")
                 self.manual_stop = False
