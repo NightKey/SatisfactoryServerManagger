@@ -10,6 +10,7 @@ loop_thread: Thread = None
 def start(msg: smdb_api.Message) -> None:
     if not api.is_admin(msg.sender):
         logger.warning("Not admin called the start function!")
+        api.send_message("Only admins can use this command!", msg.sender)
         return
     global loop_thread
     started = managger.start_server()
@@ -22,6 +23,7 @@ def start(msg: smdb_api.Message) -> None:
 def stop(msg: smdb_api.Message) -> None:
     if not api.is_admin(msg.sender):
         logger.warning("Not admin called the stop function!")
+        api.send_message("Only admins can use this command!", msg.sender)
         return
     managger.exit()
     api.send_message("Server stopped!", msg.sender)
@@ -29,15 +31,20 @@ def stop(msg: smdb_api.Message) -> None:
 def update(msg: smdb_api.Message) -> None:
     if not api.is_admin(msg.sender):
         logger.warning("Not admin called the update function!")
+        api.send_message("Only admins can use this command!", msg.sender)
         return
     updated = managger.update()
     api.send_message(("Server restarted successfully!" if managger.loop_running else "Server updated successfully!") if updated else "Server update failed!", msg.sender)
+
+def is_running(msg: smdb_api.Message) -> None:
+    api.send_message("The server is up and running" if managger.is_running else "The server is stopped", msg.sender)
 
 api = smdb_api.API("Satisfactory managger", "a4bdb9b345435631ca6b9c093324ee3a76b8322811fcd82ad04f537946ab6e88")
 api.validate()
 api.create_function("SFStart", "Starts the satisfactory server. Admin only command.\nUsage: &SFStart\nCategory: HARDWARE", start)
 api.create_function("SFUpdate", "Updates the satisfactory server. Admin only command.\nUsage: &SFUpdate\nCategory: HARDWARE", update)
 api.create_function("SFStop", "Stops the satisfactory server. Admin only command.\nUsage: &SFStop\nCategory: HARDWARE", stop)
+api.create_function("SFStatus", "Returns the satisfactory server's status.\nUsage: &SFStatus\nCategory: HARDWARE", is_running)
 try:
     while True:
         sleep(1)
