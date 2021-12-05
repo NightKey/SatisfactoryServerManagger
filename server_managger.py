@@ -40,14 +40,17 @@ class managger:
         self.environment_specific_command: command = managger.windows_run_command if platform.system() == "Windows" else managger.linux_run_command
         logger.info(f"Server managger created with server path: {self.server_path}")
 
-    def _update_server(self) -> None:
+    def _update_server(self) -> bool:
         self.logger.info("Updating server")
         update_command = managger.steam_update_command.fill(user_data=self.user_info, path=self.server_path)
         self.logger.info(f"Update called with following data: {update_command}")
         try:
             subprocess.check_call(update_command.to_cmd())
-        except subprocess.SubprocessError:
+            return True
+        except subprocess.SubprocessError as ex:
+            self.logger.error(f"Update exception: {ex}")
             self.logger.warning("Update failed!")
+            return False
 
     def start_server(self, update_before: bool = False) -> bool:
         self.logger.info(f"Start called!")
