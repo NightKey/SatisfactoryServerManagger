@@ -19,7 +19,7 @@ class command:
 SUCCESS = 0
 
 class managger:
-    steam_update_command = command("steamcmd +login {user_data} +force_install_dir {path} +app_update 1690800 validate +quit")
+    steam_update_command = command("steamcmd +force_install_dir {path} +login {user_data} +app_update 1690800 validate +quit")
     default_server_path = "~/SatisfactoryDedicatedServer"
     anonime_user_data = "anonymous"
     default_additionals = "-log -unattended"
