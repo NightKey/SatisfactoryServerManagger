@@ -86,9 +86,14 @@ class managger:
         self.manual_stop = True
         self.server.terminate()
         self.logger.info("Waiting for server to stop")
+        sleep_count = 1
         sleep(60)
         while self.server.poll() is None:
-            self.logger.warning("Serve did not terminate after 60 secunds!")
+            self.logger.warning(f"Serve did not terminate after {sleep_count*60} secunds!")
+            if sleep_count >= 2: 
+                self.logger.info("Trying to kill the server!")
+                self.server.kill()
+            sleep_count += 1
             sleep(60)
         self.logger.info("Server stopped")
         self.is_running = False
