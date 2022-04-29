@@ -111,6 +111,11 @@ class managger:
             return True
         return self._update_server()
 
+    def restart(self) -> bool:
+        self.logger.info("Restart called!")
+        if self.is_running: self.stop_server()
+        return self.start_server(False)
+
     def loop(self) -> None:
         self.logger.info("Loop started")
         self.loop_running = True
