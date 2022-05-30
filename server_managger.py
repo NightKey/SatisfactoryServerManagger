@@ -44,7 +44,7 @@ class managger:
         self.is_running: bool = False
         self.loop_running = False
         self.additionals = additionals if additionals is not None else managger.default_additionals
-        self.logger = logger if logger is not None else logger_class(
+        self.logger = logger if logger is not None else Logger(
             "satisfactory_server_managger.lg", LEVEL=LEVEL.INFO)
         self.environment_specific_command: command = managger.windows_run_command if platform.system(
         ) == "Windows" else managger.linux_run_command
