@@ -15,7 +15,7 @@ loop_thread: Thread = None
 def start(msg: smdb_api.Message) -> None:
     if not api.is_admin(msg.sender):
         logger.warning("Not admin called the start function!")
-        api.send_message("Only admins can use this command!", msg.sender)
+        api.reply_to_message("Only admins can use this command!", msg)
         return
     global loop_thread
     started = managger.start_server()
@@ -23,45 +23,42 @@ def start(msg: smdb_api.Message) -> None:
         loop_thread = Thread(target=managger.loop)
         loop_thread.name = "Server managger loop"
         loop_thread.start()
-    api.send_message(
-        "Server started successfully." if started else "Server start failed!", msg.interface, msg.sender)
+    api.reply_to_message(
+        "Server started successfully." if started else "Server start failed!", msg)
 
 
 def stop(msg: smdb_api.Message) -> None:
     if not api.is_admin(msg.sender):
         logger.warning("Not admin called the stop function!")
-        api.send_message("Only admins can use this command!",
-                         msg.interface, msg.sender)
+        api.reply_to_message("Only admins can use this command!", msg)
         return
     managger.exit()
-    api.send_message("Server stopped!", msg.sender)
+    api.reply_to_message("Server stopped!", msg)
 
 
 def update(msg: smdb_api.Message) -> None:
     if not api.is_admin(msg.sender):
         logger.warning("Not admin called the update function!")
-        api.send_message("Only admins can use this command!",
-                         msg.interface, msg.sender)
+        api.reply_to_message("Only admins can use this command!", msg)
         return
     updated = managger.update()
-    api.send_message(("Server restarted successfully!" if managger.loop_running else "Server updated successfully!")
-                     if updated else "Server update failed!", msg.interface, msg.sender)
+    api.reply_to_message(("Server restarted successfully!" if managger.loop_running else "Server updated successfully!")
+                         if updated else "Server update failed!", msg)
 
 
 def restart(msg: smdb_api.Message) -> None:
     if not api.is_admin(msg.sender):
         logger.warning("Not admin called the start function!")
-        api.send_message("Only admins can use this command!",
-                         msg.interface, msg.sender)
+        api.reply_to_message("Only admins can use this command!", msg)
         return
     restart = managger.restart()
-    api.send_message(
-        "Server restarted successfully!" if restart else "Server update failed!", msg.interface, msg.sender)
+    api.reply_to_message(
+        "Server restarted successfully!" if restart else "Server update failed!", msg)
 
 
 def is_running(msg: smdb_api.Message) -> None:
-    api.send_message(
-        "The server is up and running" if managger.is_running else "The server is stopped", msg.interface, msg.sender)
+    api.reply_to_message(
+        "The server is up and running" if managger.is_running and not managger.manual_stop else "The server is stopping" if managger.manual_stop else "The server is stopped", msg)
 
 
 logger.debug(f"Random id: {randint(0,10)}")
